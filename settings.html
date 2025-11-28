@@ -39,12 +39,15 @@
                         </div>
                     </div>
                     <div class="d-grid gap-2">
-                        <button class="btn btn-success btn-sm" onclick="SettingsView.handleExportCSV()">
+                        <button class="btn btn-success btn-sm" onclick="window.SettingsView.handleExportCSV()">
                             <i class="bi bi-file-earmark-excel me-2"></i>Laporan Excel (.csv)
                         </button>
-                        <button class="btn btn-outline-secondary btn-sm" onclick="SettingsView.handleExportJSON()">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="window.SettingsView.handleExportJSON()">
                             <i class="bi bi-code-slash me-2"></i>Backup System (.json)
                         </button>
+                    </div>
+                    <div class="mt-2 text-muted" style="font-size: 0.75rem;">
+                        *Gunakan <b>.csv</b> untuk dibaca di Excel. Gunakan <b>.json</b> untuk pindah HP (Restore).
                     </div>
                 </div>
             </div>
@@ -62,10 +65,11 @@
                             <small class="text-muted">Pulihkan dari file JSON</small>
                         </div>
                     </div>
+                    <p class="small text-muted mb-2">Pilih file backup (.json) untuk mengembalikan data.</p>
                     <div class="input-group input-group-sm">
                         <input type="file" class="form-control" id="import-file" accept=".json">
-                        <button class="btn btn-warning text-white" type="button" onclick="SettingsView.handleImport()">
-                            <i class="bi bi-upload"></i>
+                        <button class="btn btn-warning text-white" type="button" onclick="window.SettingsView.handleImport()">
+                            <i class="bi bi-upload"></i> Restore
                         </button>
                     </div>
                 </div>
@@ -77,14 +81,19 @@
         <div class="card-header bg-danger-subtle text-danger fw-bold border-danger">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>Danger Zone
         </div>
-        <div class="card-body p-4 d-flex justify-content-between align-items-center">
+        <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
             <div>
                 <h6 class="fw-bold text-danger mb-1">Reset Aplikasi</h6>
-                <p class="text-muted small mb-0">Hapus semua data permanen.</p>
+                <p class="text-muted small mb-0">Menghapus seluruh data transaksi dan akun secara permanen.</p>
             </div>
-            <button class="btn btn-outline-danger btn-sm" onclick="SettingsView.handleReset()">
-                <i class="bi bi-trash3 me-2"></i>Hapus
+            <button class="btn btn-outline-danger btn-sm" onclick="window.SettingsView.handleReset()">
+                <i class="bi bi-trash3 me-2"></i>Hapus Semua Data
             </button>
         </div>
+    </div>
+    
+    <div class="text-center mt-5 text-muted opacity-50 small pb-4">
+        <p class="mb-0">Keuanganku v1.0 (PWA Enabled)</p>
+        <p>Built with Vanilla JS & Bootstrap 5</p>
     </div>
 </div>

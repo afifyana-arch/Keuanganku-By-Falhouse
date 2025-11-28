@@ -1,13 +1,14 @@
-// Nama cache (Ganti v1 ke v2, v3 dst jika Anda update kode di masa depan agar user dapat versi baru)
-const CACHE_NAME = 'keuanganku-v1';
+// Nama cache (Update versi agar browser mengambil file baru)
+const CACHE_NAME = 'keuanganku-v3-root-icon';
 
-// DAFTAR SEMUA FILE APLIKASI DI SINI
+// Daftar file yang akan disimpan di memori HP
 const urlsToCache = [
   './',
   './index.html',
   './style.css',
   './app.js',
   './manifest.json',
+  './icon.png', // Ikon di root
   
   // Modul Fitur (HTML & JS)
   './dashboard.html', './dashboard.js',
@@ -17,35 +18,26 @@ const urlsToCache = [
   './history.html',   './history.js',
   './savings.html',   './savings.js',
   './debt.html',      './debt.js',
-  './settings.html',  './settings.js',
-  
-  // Ikon (Pastikan file ini ada)
-  './icons/icon-192x192.png',
-  './icons/icon-512x512.png'
+  './settings.html',  './settings.js'
 ];
 
 // 1. Install Service Worker
 self.addEventListener('install', event => {
+  self.skipWaiting(); // Paksa aktif segera
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Menyimpan file ke cache...');
+        console.log('Menyimpan file aplikasi ke cache...');
         return cache.addAll(urlsToCache);
       })
   );
 });
 
-// 2. Fetch: Gunakan strategi "Stale-While-Revalidate" atau "Network First"
-// Agar saat Anda update codingan, user tidak terjebak di versi lama selamanya.
+// 2. Fetch Strategy: Cache First, Network Fallback
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
-      // Kembalikan cache jika ada
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      // Jika tidak ada di cache, ambil dari jaringan
-      return fetch(event.request);
+      return cachedResponse || fetch(event.request);
     })
   );
 });
@@ -57,7 +49,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Menghapus cache lama:', cacheName);
+            console.log('Membersihkan cache lama:', cacheName);
             return caches.delete(cacheName);
           }
         })

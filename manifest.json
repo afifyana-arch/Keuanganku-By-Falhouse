@@ -1,7 +1,7 @@
 {
   "name": "Keuanganku",
   "short_name": "Keuanganku",
-  "description": "Aplikasi manajemen keuangan pribadi yang simpel dan elegan.",
+  "description": "Aplikasi manajemen keuangan pribadi.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -10,12 +10,12 @@
   "theme_color": "#739072",
   "icons": [
     {
-      "src": "icons/icon-192x192.png",
+      "src": "icon.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "icons/icon-512x512.png",
+      "src": "icon.png",
       "type": "image/png",
       "sizes": "512x512"
     }
