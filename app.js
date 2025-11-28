@@ -6,7 +6,7 @@
 const defaultDB = {
     // Tambahkan Default Profile
     profile: {
-        name: 'Afif Shafly',
+        name: 'User',
         role: 'Owner'
     },
     accounts: [
