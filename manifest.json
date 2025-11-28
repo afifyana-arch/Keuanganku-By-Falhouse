@@ -1,12 +1,13 @@
 {
-  "name": "Keuanganku by falhouse",
+  "name": "Keuanganku",
   "short_name": "Keuanganku",
-  "description": "Aplikasi pelacak keuangan pribadi.",
-  "start_url": ".",
+  "description": "Aplikasi manajemen keuangan pribadi yang simpel dan elegan.",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#F1F3F9",
   "theme_color": "#739072",
-  "scope": "/",
   "icons": [
     {
       "src": "icons/icon-192x192.png",
