@@ -1,0 +1,90 @@
+<div class="fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Pengaturan</h4>
+            <p class="text-muted small mb-0">Kelola profil dan data aplikasi</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-person-circle me-2"></i>Profil Pengguna</h6>
+            <form id="profile-form" class="row g-3 align-items-end" onsubmit="event.preventDefault(); window.SettingsView.handleSaveProfile();">
+                <div class="col-12 col-md-5">
+                    <label class="form-label text-secondary small fw-bold">NAMA PANGGILAN</label>
+                    <input type="text" class="form-control" id="setting-name" placeholder="Nama Anda" required>
+                </div>
+                <div class="col-12 col-md-5">
+                    <label class="form-label text-secondary small fw-bold">ROLE / STATUS</label>
+                    <input type="text" class="form-control" id="setting-role" placeholder="Contoh: Owner, CEO, Bos Muda" required>
+                </div>
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="btn btn-brand-primary w-100" id="btn-save-profile">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                            <i class="bi bi-file-earmark-spreadsheet fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Ekspor Data</h6>
+                            <small class="text-muted">Unduh laporan & backup</small>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success btn-sm" onclick="SettingsView.handleExportCSV()">
+                            <i class="bi bi-file-earmark-excel me-2"></i>Laporan Excel (.csv)
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="SettingsView.handleExportJSON()">
+                            <i class="bi bi-code-slash me-2"></i>Backup System (.json)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                            <i class="bi bi-arrow-clockwise fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Restore Data</h6>
+                            <small class="text-muted">Pulihkan dari file JSON</small>
+                        </div>
+                    </div>
+                    <div class="input-group input-group-sm">
+                        <input type="file" class="form-control" id="import-file" accept=".json">
+                        <button class="btn btn-warning text-white" type="button" onclick="SettingsView.handleImport()">
+                            <i class="bi bi-upload"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-danger shadow-sm mt-4">
+        <div class="card-header bg-danger-subtle text-danger fw-bold border-danger">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>Danger Zone
+        </div>
+        <div class="card-body p-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="fw-bold text-danger mb-1">Reset Aplikasi</h6>
+                <p class="text-muted small mb-0">Hapus semua data permanen.</p>
+            </div>
+            <button class="btn btn-outline-danger btn-sm" onclick="SettingsView.handleReset()">
+                <i class="bi bi-trash3 me-2"></i>Hapus
+            </button>
+        </div>
+    </div>
+</div>

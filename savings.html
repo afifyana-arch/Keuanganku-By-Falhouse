@@ -1,0 +1,160 @@
+<div class="fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Target Tabungan</h4>
+            <p class="text-muted small mb-0">Wujudkan impian finansial Anda</p>
+        </div>
+        <button class="btn btn-brand-primary" onclick="window.SavingsView.openCreateModal()">
+            <i class="bi bi-plus-lg me-1"></i> <span class="d-none d-sm-inline">Buat Tujuan Baru</span>
+        </button>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4 bg-primary-subtle overflow-hidden">
+        <div class="card-body p-4 position-relative">
+            <i class="bi bi-safe position-absolute text-primary opacity-25" style="font-size: 8rem; right: -20px; bottom: -20px; transform: rotate(-15deg);"></i>
+            
+            <div class="row g-4 position-relative z-1">
+                <div class="col-12 col-md-6 border-end-md border-primary-subtle">
+                    <h6 class="text-primary-emphasis mb-2 fw-bold text-uppercase small" style="letter-spacing: 1px;">Total Tabungan Terkumpul</h6>
+                    <h2 class="fw-bold text-primary mb-0 display-6" id="summary-total-saved">Rp 0</h2>
+                    <p class="small text-muted mb-0 mt-1">Dari <span id="summary-goal-count">0</span> tujuan finansial</p>
+                </div>
+
+                <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
+                    <div class="d-flex justify-content-between small mb-1 fw-bold text-primary-emphasis">
+                        <span>Progress Keseluruhan</span>
+                        <span id="summary-percentage">0%</span>
+                    </div>
+                    <div class="progress bg-white bg-opacity-50 mb-2" style="height: 10px; border-radius: 10px;">
+                        <div class="progress-bar bg-primary" id="summary-progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Kekurangan: <span class="fw-bold" id="summary-remaining">Rp 0</span></span>
+                        <span>Target: <span id="summary-total-target">Rp 0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="savings-list" class="row g-3">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-secondary" role="status"></div>
+            <p class="text-muted mt-2">Memuat data tabungan...</p>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-create-goal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold">Buat Tujuan Baru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-create-goal">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small fw-bold">NAMA TUJUAN</label>
+                            <input type="text" class="form-control form-control-lg" id="goal-name" placeholder="Contoh: Laptop Baru, Liburan" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small fw-bold">TARGET DANA (OPSIONAL)</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light border-end-0 text-muted">Rp</span>
+                                <input type="text" class="form-control border-start-0" id="goal-target" placeholder="0" inputmode="numeric" data-currency-input="true">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small fw-bold">IKON</label>
+                            <select class="form-select" id="goal-icon">
+                                <option value="bi-piggy-bank-fill">Celengan (Default)</option>
+                                <option value="bi-laptop">Gadget / Laptop</option>
+                                <option value="bi-house-heart-fill">Rumah</option>
+                                <option value="bi-car-front-fill">Kendaraan</option>
+                                <option value="bi-airplane-fill">Liburan</option>
+                                <option value="bi-mortarboard-fill">Pendidikan</option>
+                                <option value="bi-ring">Pernikahan</option>
+                                <option value="bi-gift-fill">Hadiah</option>
+                                <option value="bi-shield-check">Dana Darurat</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light text-muted" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-brand-primary px-4" onclick="window.SavingsView.handleSaveGoal()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-topup" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-success"><i class="bi bi-arrow-down-circle me-2"></i>Isi Tabungan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">Uang akan dipindahkan dari Akun ke <strong id="topup-goal-name" class="text-dark"></strong>.</p>
+                    <input type="hidden" id="topup-goal-id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">AMBIL DARI AKUN</label>
+                        <select class="form-select form-select-lg" id="topup-source-account"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">JUMLAH (IDR)</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-success text-white border-0">Rp</span>
+                            <input type="text" class="form-control border-success" id="topup-amount" required inputmode="numeric" data-currency-input="true">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-success w-100" onclick="window.SavingsView.handleTopUp()">
+                        <i class="bi bi-check-lg me-1"></i> Konfirmasi Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-withdraw" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-primary"><i class="bi bi-arrow-up-right-circle me-2"></i>Gunakan Tabungan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">Uang dari <strong id="withdraw-goal-name" class="text-dark"></strong> akan masuk ke Akun Anda.</p>
+                    <input type="hidden" id="withdraw-goal-id">
+                    
+                    <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded mb-3">
+                        <span class="small text-muted">Saldo Tersedia:</span>
+                        <span class="fw-bold text-primary" id="withdraw-available-balance">Rp 0</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">MASUKKAN KE AKUN</label>
+                        <select class="form-select form-select-lg" id="withdraw-dest-account"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">JUMLAH (IDR)</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-primary text-white border-0">Rp</span>
+                            <input type="text" class="form-control border-primary" id="withdraw-amount" required inputmode="numeric" data-currency-input="true">
+                            <button class="btn btn-outline-primary" type="button" onclick="window.SavingsView.useMaxWithdraw()">Semua</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-primary w-100" onclick="window.SavingsView.handleWithdraw()">
+                        <i class="bi bi-check-lg me-1"></i> Konfirmasi Cairkan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

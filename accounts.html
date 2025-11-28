@@ -1,0 +1,89 @@
+<div class="fade-in">
+    <div class="card border-0 shadow-sm mb-4 bg-primary text-white overflow-hidden">
+        <div class="card-body p-4 position-relative">
+            <i class="bi bi-wallet2 position-absolute text-white opacity-25" style="font-size: 10rem; right: -30px; top: -30px; transform: rotate(-10deg);"></i>
+            
+            <div class="position-relative z-1">
+                <h6 class="text-white-50 mb-1 text-uppercase small fw-bold" style="letter-spacing: 1px;">Total Aset Bersih</h6>
+                <h1 class="fw-bold mb-0 display-4" id="total-assets">Rp 0</h1>
+                <p class="text-white-50 small mb-0 mt-2">
+                    Tersebar di <span class="fw-bold text-white" id="total-accounts-count">0</span> akun/dompet.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-secondary mb-0">Daftar Dompet & Bank</h5>
+        <button class="btn btn-brand-primary btn-sm" onclick="window.AccountsView.openModal()">
+            <i class="bi bi-plus-lg me-1"></i>Tambah Akun
+        </button>
+    </div>
+
+    <div id="accounts-list" class="row g-3">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-secondary" role="status"></div>
+            <p class="text-muted mt-2">Memuat akun...</p>
+        </div>
+    </div>
+
+    <div class="modal fade" id="account-modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="account-modal-title">Tambah Akun Baru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <form id="account-form">
+                        <input type="hidden" id="account-id">
+                        
+                        <div class="mb-3 text-center">
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary mb-2" 
+                                 style="width: 60px; height: 60px; font-size: 1.5rem;" id="icon-display-preview">
+                                <i class="bi bi-wallet2"></i>
+                            </div>
+                            <p class="small text-muted mb-2">Pilih Ikon</p>
+                            <select class="form-select text-center w-50 mx-auto" id="account-icon">
+                                <option value="bi-wallet2">Dompet</option>
+                                <option value="bi-bank">Bank</option>
+                                <option value="bi-credit-card-2-front">Kartu Kredit/Debit</option>
+                                <option value="bi-phone">E-Wallet (OVO/Gopay)</option>
+                                <option value="bi-piggy-bank">Celengan</option>
+                                <option value="bi-safe">Brankas</option>
+                                <option value="bi-briefcase">Bisnis</option>
+                                <option value="bi-paypal">PayPal/Global</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small fw-bold">NAMA AKUN</label>
+                            <input type="text" class="form-control" id="account-name" placeholder="Cth: BCA Utama, Dompet Saku" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small fw-bold">NO. REKENING (OPSIONAL)</label>
+                            <input type="text" class="form-control font-monospace" id="account-number" placeholder="Cth: 1234-5678-90">
+                            <div class="form-text small">Berguna untuk copy-paste saat dibutuhkan.</div>
+                        </div>
+
+                        <div class="mb-3" id="field-initial-balance">
+                            <label class="form-label text-secondary small fw-bold">SALDO SAAT INI (IDR)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0">Rp</span>
+                                <input type="text" class="form-control border-start-0" id="initial-balance" placeholder="0" inputmode="numeric" data-currency-input="true">
+                            </div>
+                            <div class="form-text small text-danger"><i class="bi bi-info-circle me-1"></i>Hanya bisa diisi saat pembuatan awal.</div>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light text-muted" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-brand-primary px-4" id="btn-save-account" onclick="window.AccountsView.handleSave()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

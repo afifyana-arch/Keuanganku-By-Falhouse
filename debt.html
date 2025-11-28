@@ -1,0 +1,97 @@
+<div class="fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Manajemen Hutang</h4>
+            <p class="text-muted small mb-0">Pantau kewajiban dan PayLater</p>
+        </div>
+        <button class="btn btn-outline-primary" onclick="loadFragment('tracking')">
+            <i class="bi bi-plus-lg me-1"></i> <span class="d-none d-sm-inline">Catat Hutang Baru</span>
+        </button>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4 bg-danger-subtle overflow-hidden">
+        <div class="card-body p-4 position-relative">
+            <i class="bi bi-exclamation-triangle position-absolute text-danger opacity-25" style="font-size: 8rem; right: -20px; bottom: -30px; transform: rotate(-15deg);"></i>
+            
+            <div class="row g-4 position-relative z-1">
+                <div class="col-12 col-md-7 border-end-md border-danger-subtle">
+                    <h6 class="text-danger-emphasis mb-2 fw-bold text-uppercase small" style="letter-spacing: 1px;">Sisa Kewajiban Belum Lunas</h6>
+                    <h2 class="fw-bold text-danger mb-0 display-6" id="debt-summary-total">Rp 0</h2>
+                    <p class="small text-danger-emphasis mb-0 mt-1">
+                        <i class="bi bi-receipt-cutoff me-1"></i><span id="debt-summary-count">0</span> tagihan aktif
+                    </p>
+                </div>
+
+                <div class="col-12 col-md-5 d-flex flex-column justify-content-center">
+                    <div class="p-3 bg-white bg-opacity-50 rounded-3 border border-danger-subtle">
+                        <small class="text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">JATUH TEMPO TERDEKAT</small>
+                        <div class="d-flex align-items-center mt-1" id="debt-summary-nearest">
+                            <span class="text-muted small fst-italic">Tidak ada tagihan mendesak</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-pills mb-3" id="debt-tabs">
+        <li class="nav-item">
+            <a class="nav-link active small fw-bold" href="#" onclick="DebtView.setFilter('active')">Tagihan Aktif</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link small fw-bold" href="#" onclick="DebtView.setFilter('paid')">Riwayat Lunas</a>
+        </li>
+    </ul>
+
+    <div id="debt-list" class="row g-3">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-secondary" role="status"></div>
+            <p class="text-muted mt-2">Memuat data hutang...</p>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-pay-debt" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-success"><i class="bi bi-wallet2 me-2"></i>Bayar Cicilan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="bg-light p-3 rounded mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span class="small text-muted">Bayar ke:</span>
+                            <span class="fw-bold text-dark" id="pay-debt-name">-</span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <span class="small text-muted">Sisa Tagihan:</span>
+                            <span class="fw-bold text-danger" id="pay-debt-remaining">Rp 0</span>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" id="pay-debt-id">
+                    
+                    <form id="form-pay-debt">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small fw-bold">SUMBER DANA</label>
+                            <select class="form-select form-select-lg" id="pay-source-account"></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small fw-bold">JUMLAH BAYAR (IDR)</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-success text-white border-0">Rp</span>
+                                <input type="text" class="form-control border-success" id="pay-amount" required inputmode="numeric" data-currency-input="true">
+                                <button class="btn btn-outline-success" type="button" onclick="window.DebtView.useFullAmount()">Lunas</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-success w-100" id="btn-confirm-pay" onclick="window.DebtView.handlePay()">
+                        <i class="bi bi-check-circle-fill me-1"></i> Konfirmasi Pembayaran
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,126 @@
+<div class="fade-in">
+    <div class="row g-4">
+        
+        <div class="col-12 col-lg-7">
+            <div class="card shadow-sm h-100 border-0" style="border-radius: 20px;">
+                <div class="card-body p-4">
+                    <h4 class="mb-4 fw-bold text-secondary">
+                        <i class="bi bi-pencil-square me-2"></i>Catat Transaksi
+                    </h4>
+                    
+                    <form id="transaction-form">
+                        
+                        <div class="mb-4">
+                            <div class="nav nav-pills nav-fill bg-light p-1 rounded-3" id="tx-type-selector">
+                                <a class="nav-link active rounded-3 small fw-bold" id="tab-expense" data-type="expense" href="#">Pengeluaran</a>
+                                <a class="nav-link rounded-3 small fw-bold" id="tab-income" data-type="income" href="#">Pemasukan</a>
+                                <a class="nav-link rounded-3 small fw-bold" id="tab-transfer" data-type="transfer" href="#">Transfer</a>
+                            </div>
+                            <input type="hidden" id="tx-type" value="expense">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="amount" class="form-label text-secondary small fw-bold">NOMINAL (IDR)</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light border-end-0 fw-bold text-muted">Rp</span>
+                                <input type="text" class="form-control border-start-0 fw-bold fs-3 text-dark" id="amount" placeholder="0" required inputmode="numeric" data-currency-input="true">
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6" id="field-source">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label text-secondary small fw-bold mb-0">DARI AKUN</label>
+                                    <small class="text-muted fst-italic" id="source-balance-display"></small>
+                                </div>
+                                <select class="form-select" id="source-account">
+                                    <option value="" disabled selected>Pilih Akun...</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6 d-none" id="field-destination">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label text-secondary small fw-bold mb-0">KE AKUN</label>
+                                    <small class="text-muted fst-italic" id="dest-balance-display"></small>
+                                </div>
+                                <select class="form-select" id="destination-account">
+                                    <option value="" disabled selected>Pilih Akun...</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6" id="field-category">
+                                <label class="form-label text-secondary small fw-bold">KATEGORI</label>
+                                <select class="form-select" id="category"></select>
+                                
+                                <div id="budget-status-alert" class="mt-2" style="display: none;"></div>
+                            </div>
+
+                            <div class="col-12 col-md-12">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label text-secondary small fw-bold mb-0">TANGGAL</label>
+                                    <div class="d-flex gap-1">
+                                        <span class="badge bg-light text-secondary border cursor-pointer date-chip" onclick="window.TrackingView.setQuickDate(-1)">Kemarin</span>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle cursor-pointer date-chip" onclick="window.TrackingView.setQuickDate(0)">Hari Ini</span>
+                                    </div>
+                                </div>
+                                <input type="date" class="form-control" id="date" required>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label text-secondary small fw-bold">CATATAN</label>
+                                <textarea class="form-control" id="description" rows="2" placeholder="Keterangan transaksi..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="toggle-debt">
+                                <label class="form-check-label small text-muted" for="toggle-debt" id="label-toggle-debt">
+                                    Opsi Hutang / PayLater
+                                </label>
+                            </div>
+                            <div class="mt-2 p-3 bg-light rounded d-none" id="debt-details">
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <input type="text" class="form-control form-control-sm" id="debt-lender" placeholder="Nama Pemberi Hutang/Aplikasi">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="small text-muted" style="font-size: 0.7rem;">Jatuh Tempo</label>
+                                        <input type="date" class="form-control form-control-sm" id="debt-due-date">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="small text-muted" style="font-size: 0.7rem;">Tenor (Bln)</label>
+                                        <input type="number" class="form-control form-control-sm" id="debt-tenor" value="1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-brand-primary btn-lg" id="btn-save">
+                                <i class="bi bi-save me-2"></i>Simpan Transaksi
+                            </button>
+                            <div class="form-check text-center mx-auto">
+                                <input class="form-check-input" type="checkbox" id="check-add-another" checked>
+                                <label class="form-check-label small text-muted" for="check-add-another">
+                                    Tetap di halaman ini
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="card shadow-sm h-100 border-0" style="background-color: #f8f9fa; border-radius: 20px;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h6 class="fw-bold text-secondary mb-0">Baru Ditambahkan</h6>
+                    <small><a href="#" onclick="loadFragment('history')" class="text-decoration-none fw-bold" style="font-size: 0.8rem;">Lihat Semua</a></small>
+                </div>
+                <div class="card-body px-3 pt-3">
+                    <div id="mini-history-list" class="vstack gap-2">
+                        <div class="text-center text-muted py-4 small">
+                            <div class="spinner-border spinner-border-sm

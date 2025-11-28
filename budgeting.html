@@ -1,0 +1,95 @@
+<div class="fade-in">
+    <div class="card border-0 shadow-sm mb-4 bg-success-subtle overflow-hidden">
+        <div class="card-body p-4 position-relative">
+            <i class="bi bi-wallet2 position-absolute text-success opacity-25" style="font-size: 8rem; right: -20px; bottom: -30px; transform: rotate(-15deg);"></i>
+            
+            <div class="row g-4 position-relative z-1 align-items-center">
+                <div class="col-12 col-md-6 border-end-md border-success-subtle">
+                    <div class="d-flex align-items-center gap-3">
+                        <input type="month" class="form-control form-control-lg bg-white border-0 shadow-sm w-auto fw-bold" id="budget-month">
+                    </div>
+                    <p class="small text-success-emphasis mb-0 mt-2">
+                        Pilih bulan untuk melihat analisis anggaran.
+                    </p>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <div class="d-flex justify-content-between small text-success-emphasis fw-bold text-uppercase mb-1">
+                        <span>Total Anggaran</span>
+                        <span>Total Terpakai</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end">
+                        <h4 class="fw-bold text-success mb-0" id="summary-total-budget">Rp 0</h4>
+                        <h4 class="fw-bold text-dark mb-0" id="summary-total-spent">Rp 0</h4>
+                    </div>
+                    <div class="progress bg-white bg-opacity-50 mt-2" style="height: 6px;">
+                        <div class="progress-bar bg-success" id="summary-progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div class="text-end mt-1">
+                        <small class="text-muted" id="summary-text-status">Aman</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mb-3">
+        <button class="btn btn-outline-secondary btn-sm d-none" id="btn-copy-prev" onclick="window.BudgetView.handleCopy()">
+            <i class="bi bi-copy me-1"></i>Salin Bulan Lalu
+        </button>
+        <button class="btn btn-brand-primary btn-sm" onclick="window.BudgetView.toggleForm()">
+            <i class="bi bi-plus-lg me-1"></i>Atur Budget
+        </button>
+    </div>
+
+    <div class="collapse mb-4" id="collapse-budget-form">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <form id="budget-form" class="row g-3 align-items-end">
+                    <div class="col-12 col-md-5">
+                        <label class="form-label text-secondary small fw-bold">KATEGORI</label>
+                        <select class="form-select" id="budget-category" required></select>
+                    </div>
+                    <div class="col-12 col-md-5">
+                        <label class="form-label text-secondary small fw-bold">BATAS MAX (IDR)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">Rp</span>
+                            <input type="text" class="form-control border-start-0" id="budget-amount" placeholder="0" required inputmode="numeric" data-currency-input="true">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-2">
+                        <button type="submit" class="btn btn-success w-100" id="btn-save-budget">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="budget-list" class="row g-3">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-secondary" role="status"></div>
+            <p class="text-muted mt-2">Menganalisis pengeluaran...</p>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-budget-detail" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <div>
+                        <h5 class="modal-title fw-bold" id="detail-category-title">Detail Kategori</h5>
+                        <p class="text-muted small mb-0" id="detail-month-subtitle">Bulan ini</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="list-group list-group-flush mt-3" id="detail-transaction-list">
+                        </div>
+                </div>
+                <div class="modal-footer border-0 pt-2">
+                    <button type="button" class="btn btn-light w-100 text-muted" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
