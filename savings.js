@@ -1,11 +1,7 @@
 /**
- * MODULE: SAVINGS (Revisi #4 - Total Summary)
- * Menangani Tujuan Tabungan, Top Up, dan Penarikan
+ * MODULE: SAVINGS (Logika Final: Lock & Unlock)
  */
 
-// =======================================================
-// 1. DATA SERVICE
-// =======================================================
 if (!window.SavingsService) {
     window.SavingsService = {
         async getAll() {
@@ -23,6 +19,8 @@ if (!window.SavingsService) {
             });
         },
 
+        // TOP UP = MENGUNCI SALDO (Locking)
+        // Saldo Aktif berkurang, Saldo Reserved bertambah. Uang Fisik TETAP.
         async topUp(goalId, sourceAccountId, amount) {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
@@ -30,47 +28,66 @@ if (!window.SavingsService) {
                     const account = db.accounts.find(a => a.id === sourceAccountId);
                     if (!goal) return reject("Tujuan tidak ditemukan");
                     if (!account) return reject("Akun sumber tidak ditemukan");
-                    if (account.balance < amount) return reject("Saldo akun tidak mencukupi");
+                    
+                    // Cek Saldo Aktif (Bukan Saldo Fisik)
+                    const availableBalance = account.balance - (account.reserved || 0);
+                    
+                    if (availableBalance < amount) return reject("Saldo aktif tidak mencukupi (termasuk dana terkunci).");
 
+                    // AKSI: Tambah ke Goal, Kunci Saldo di Akun
                     goal.current += amount;
-                    account.balance -= amount;
+                    account.reserved = (account.reserved || 0) + amount;
+
+                    // Catat History 'lock' (Agar tercatat tapi tidak mengurangi harta)
                     db.transactions.push({
                         id: Date.now(),
-                        type: 'expense',
+                        type: 'lock', 
                         amount: amount,
                         category: 'Tabungan',
-                        description: `Menabung ke: ${goal.name}`,
+                        description: `Alokasi ke: ${goal.name}`,
                         date: new Date().toISOString().split('T')[0],
                         sourceAccountId: sourceAccountId,
                         destinationAccountId: null
                     });
+                    
                     saveDataToLocalStorage();
                     resolve({ success: true });
                 }, 400);
             });
         },
 
+        // CAIRKAN = MELEPAS KUNCI (Unlocking)
+        // Saldo Reserved berkurang, Saldo Aktif otomatis bertambah kembali.
         async withdraw(goalId, destAccountId, amount) {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     const goal = db.savings.find(g => g.id === goalId);
-                    const account = db.accounts.find(a => a.id === destAccountId);
+                    const account = db.accounts.find(a => a.id === destAccountId); // Akun tempat uang dikunci
                     if (!goal) return reject("Tujuan tidak ditemukan");
                     if (!account) return reject("Akun tujuan tidak ditemukan");
-                    if (goal.current < amount) return reject("Saldo tabungan tidak mencukupi");
+                    if (goal.current < amount) return reject("Saldo tabungan ini tidak mencukupi");
 
+                    // AKSI: Kurangi Goal, Lepas Kunci Saldo
                     goal.current -= amount;
-                    account.balance += amount;
+                    
+                    // Kurangi reserved (Otomatis Available Balance naik)
+                    account.reserved = (account.reserved || 0) - amount;
+                    
+                    // Safety check agar reserved tidak minus
+                    if(account.reserved < 0) account.reserved = 0;
+
+                    // Catat History 'unlock'
                     db.transactions.push({
                         id: Date.now(),
-                        type: 'income',
+                        type: 'unlock', 
                         amount: amount,
-                        category: 'Hasil Tabungan',
-                        description: `Cairkan dari: ${goal.name}`,
+                        category: 'Cairkan Tabungan',
+                        description: `Cair dari: ${goal.name}`,
                         date: new Date().toISOString().split('T')[0],
                         sourceAccountId: null,
                         destinationAccountId: destAccountId
                     });
+                    
                     saveDataToLocalStorage();
                     resolve({ success: true });
                 }, 400);
@@ -80,6 +97,8 @@ if (!window.SavingsService) {
         async delete(id) {
             return new Promise(resolve => {
                 setTimeout(() => {
+                    // Peringatan: Menghapus goal di sini tidak otomatis melepas reserved balance
+                    // User disarankan withdraw (cairkan) dulu sampai 0 baru hapus.
                     db.savings = db.savings.filter(g => g.id !== id);
                     saveDataToLocalStorage();
                     resolve({ success: true });
@@ -89,9 +108,7 @@ if (!window.SavingsService) {
     };
 }
 
-// =======================================================
-// 2. VIEW CONTROLLER
-// =======================================================
+// VIEW CONTROLLER
 window.SavingsView = {
     modals: {},
     activeGoal: null,
@@ -116,7 +133,6 @@ window.SavingsView = {
         try {
             const goals = await window.SavingsService.getAll();
             
-            // --- RENDER SUMMARY (BARU) ---
             this.renderSummary(goals);
 
             if (goals.length === 0) {
@@ -129,30 +145,18 @@ window.SavingsView = {
                 return;
             }
 
-            // --- RENDER LIST ---
             container.innerHTML = goals.map(goal => {
                 let percent = 0;
                 let progressColor = 'bg-success';
-                let progressHTML = '';
                 
                 if (goal.target > 0) {
                     percent = (goal.current / goal.target) * 100;
                     if (percent >= 100) progressColor = 'bg-primary';
-                    progressHTML = `
-                        <div class="d-flex justify-content-between small mb-1 mt-3">
-                            <span class="text-muted">Target: ${formatCurrency(goal.target)}</span>
-                            <span class="fw-bold ${percent >= 100 ? 'text-primary' : 'text-success'}">${Math.min(percent, 100).toFixed(0)}%</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar ${progressColor}" role="progressbar" style="width: ${Math.min(percent, 100)}%"></div>
-                        </div>`;
-                } else {
-                    progressHTML = `<div class="mt-3 text-muted small fst-italic">Tidak ada target nominal</div>`;
                 }
 
                 return `
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm">
+                    <div class="card h-100 border shadow-sm">
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex align-items-center">
@@ -172,10 +176,20 @@ window.SavingsView = {
                                 </div>
                             </div>
                             <h3 class="fw-bold mt-2 mb-0 text-dark">${formatCurrency(goal.current)}</h3>
-                            ${progressHTML}
+                            
+                            ${goal.target > 0 ? `
+                                <div class="d-flex justify-content-between small mb-1 mt-3">
+                                    <span class="text-muted">Target: ${formatCurrency(goal.target)}</span>
+                                    <span class="fw-bold text-success">${Math.min(percent, 100).toFixed(0)}%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar ${progressColor}" role="progressbar" style="width: ${Math.min(percent, 100)}%"></div>
+                                </div>
+                            ` : `<div class="mt-3 small text-muted fst-italic">Tidak ada target nominal</div>`}
+
                             <div class="mt-4 d-flex gap-2">
                                 <button class="btn btn-success flex-grow-1" onclick="window.SavingsView.openTopUpModal(${goal.id})"><i class="bi bi-plus-circle me-1"></i> Isi</button>
-                                <button class="btn btn-outline-secondary flex-grow-1" onclick="window.SavingsView.openWithdrawModal(${goal.id})"><i class="bi bi-arrow-up-right me-1"></i> Pakai</button>
+                                <button class="btn btn-outline-secondary flex-grow-1" onclick="window.SavingsView.openWithdrawModal(${goal.id})"><i class="bi bi-unlock me-1"></i> Cair</button>
                             </div>
                         </div>
                     </div>
@@ -186,24 +200,20 @@ window.SavingsView = {
         }
     },
 
-    // --- LOGIKA SUMMARY (BARU) ---
     renderSummary(goals) {
-        // Hitung Total
         const totalSaved = goals.reduce((sum, g) => sum + g.current, 0);
         const totalTarget = goals.reduce((sum, g) => sum + g.target, 0);
         
-        // Hitung Global Progress
         let globalPercent = 0;
         if (totalTarget > 0) {
             globalPercent = (totalSaved / totalTarget) * 100;
-        } else if (totalSaved > 0 && totalTarget === 0) {
-            // Kasus khusus: ada tabungan tapi tanpa target, anggap 100% atau N/A
+        } else if (totalSaved > 0) {
             globalPercent = 100; 
         }
 
         const remaining = Math.max(0, totalTarget - totalSaved);
 
-        // Update DOM
+        // Update DOM Elements di Header
         const elTotal = document.getElementById('summary-total-saved');
         const elCount = document.getElementById('summary-goal-count');
         const elPercent = document.getElementById('summary-percentage');
@@ -243,7 +253,11 @@ window.SavingsView = {
         document.getElementById('topup-amount').value = '';
         
         const accounts = db.accounts || [];
-        document.getElementById('topup-source-account').innerHTML = accounts.map(a => `<option value="${a.id}">${a.name} (${formatCurrency(a.balance)})</option>`).join('');
+        // Tampilkan Saldo Aktif (Available) di dropdown agar user tidak bingung
+        document.getElementById('topup-source-account').innerHTML = accounts.map(a => {
+            const avail = a.balance - (a.reserved || 0);
+            return `<option value="${a.id}">${a.name} (Aktif: ${formatCurrency(avail)})</option>`;
+        }).join('');
         this.modals.topup.show();
     },
 
@@ -268,6 +282,7 @@ window.SavingsView = {
         document.getElementById('withdraw-available-balance').textContent = formatCurrency(this.activeGoal.current);
         
         const accounts = db.accounts || [];
+        // Di sini kita memilih akun mana yang akan di-"unlock" reserved-nya
         document.getElementById('withdraw-dest-account').innerHTML = accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
         this.modals.withdraw.show();
     },
@@ -291,7 +306,7 @@ window.SavingsView = {
     },
 
     async handleDelete(id) {
-        if(!confirm("Hapus tujuan tabungan ini? Data saldo hilang.")) return;
+        if(!confirm("Hapus tujuan tabungan ini? Pastikan saldo sudah dicairkan (0) agar tidak ada dana nyangkut.")) return;
         await window.SavingsService.delete(id);
         await this.render();
     }

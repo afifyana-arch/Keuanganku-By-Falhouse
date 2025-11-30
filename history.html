@@ -1,111 +1,95 @@
 <div class="fade-in">
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-md-6">
-            <div class="p-3 bg-success-subtle rounded-4 border border-success-subtle h-100">
-                <small class="text-success-emphasis fw-bold text-uppercase" style="font-size: 0.7rem;">Total Pemasukan (Terfilter)</small>
-                <h4 class="fw-bold text-success mb-0 mt-1" id="filter-total-income">Rp 0</h4>
+    <!-- 1. DYNAMIC SUMMARY -->
+    <div class="row g-2 mb-3">
+        <div class="col-6">
+            <div class="p-2 bg-success-subtle rounded-3 border border-success-subtle h-100 text-center">
+                <small class="text-success-emphasis fw-bold text-uppercase" style="font-size: 0.65rem;">Total Pemasukan</small>
+                <div class="fw-bold text-success" id="filter-total-income" style="font-size: 0.9rem;">Rp 0</div>
             </div>
         </div>
-        <div class="col-12 col-md-6">
-            <div class="p-3 bg-danger-subtle rounded-4 border border-danger-subtle h-100">
-                <small class="text-danger-emphasis fw-bold text-uppercase" style="font-size: 0.7rem;">Total Pengeluaran (Terfilter)</small>
-                <h4 class="fw-bold text-danger mb-0 mt-1" id="filter-total-expense">Rp 0</h4>
+        <div class="col-6">
+            <div class="p-2 bg-danger-subtle rounded-3 border border-danger-subtle h-100 text-center">
+                <small class="text-danger-emphasis fw-bold text-uppercase" style="font-size: 0.65rem;">Total Pengeluaran</small>
+                <div class="fw-bold text-danger" id="filter-total-expense" style="font-size: 0.9rem;">Rp 0</div>
             </div>
         </div>
     </div>
 
-    <div class="card shadow-sm mb-4 border-0" style="border-radius: 16px;">
-        <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold text-secondary mb-0"><i class="bi bi-funnel me-2"></i>Filter Data</h6>
-                <button class="btn btn-sm btn-link text-decoration-none" onclick="window.HistoryView.resetFilter()">Reset</button>
-            </div>
-            
-            <div class="row g-3">
-                <div class="col-12 col-lg-4">
-                    <div class="input-group">
+    <!-- 2. FILTER & SEARCH -->
+    <div class="card shadow-sm mb-3 border-0" style="border-radius: 12px;">
+        <div class="card-body p-3">
+            <!-- Search & Type Row -->
+            <div class="row g-2 mb-2">
+                <div class="col-8">
+                    <div class="input-group input-group-sm">
                         <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
-                        <input type="text" class="form-control border-start-0" id="filter-search" placeholder="Cari keterangan...">
+                        <input type="text" class="form-control border-start-0" id="filter-search" placeholder="Cari...">
                     </div>
                 </div>
-
-                <div class="col-6 col-md-3 col-lg-2">
-                    <select class="form-select" id="filter-type">
+                <div class="col-4">
+                    <select class="form-select form-select-sm" id="filter-type">
                         <option value="all">Semua Tipe</option>
                         <option value="income">Pemasukan</option>
                         <option value="expense">Pengeluaran</option>
                         <option value="transfer">Transfer</option>
                     </select>
                 </div>
-
-                <div class="col-6 col-md-3 col-lg-3">
-                    <select class="form-select" id="filter-account">
-                        <option value="all">Semua Akun</option>
-                        </select>
-                </div>
-
-                <div class="col-12 col-md-12 col-lg-3">
-                    <div class="input-group">
-                        <input type="date" class="form-control" id="filter-date-start">
-                        <span class="input-group-text bg-light border-0">-</span>
-                        <input type="date" class="form-control" id="filter-date-end">
-                    </div>
-                </div>
             </div>
+
+            <!-- Quick Date Filters (Pills) -->
+            <div class="d-flex gap-2 overflow-auto pb-1" id="quick-filter-container">
+                <button class="btn btn-sm btn-dark rounded-pill px-3 flex-shrink-0" onclick="window.HistoryView.setPeriod('all', this)">Semua</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 flex-shrink-0" onclick="window.HistoryView.setPeriod('7days', this)">7 Hari</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 flex-shrink-0" onclick="window.HistoryView.setPeriod('thisMonth', this)">Bulan Ini</button>
+                <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 flex-shrink-0" onclick="window.HistoryView.setPeriod('lastMonth', this)">Bulan Lalu</button>
+            </div>
+            
+            <input type="hidden" id="filter-date-start">
+            <input type="hidden" id="filter-date-end">
         </div>
     </div>
 
-    <div id="history-list" class="vstack gap-3">
+    <!-- 3. TRANSACTION LIST -->
+    <!-- Menggunakan vstack gap-2 untuk jarak antar card yang rapat -->
+    <div id="history-list" class="vstack gap-2 pb-5">
          <div class="text-center py-5">
-            <div class="spinner-border text-secondary" role="status"></div>
-            <p class="text-muted mt-2">Memuat riwayat transaksi...</p>
+            <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
         </div>
     </div>
 
+    <!-- 4. MODAL EDIT -->
     <div class="modal fade" id="modal-edit-transaction" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold">Edit Transaksi</h5>
+                    <h6 class="modal-title fw-bold">Edit Transaksi</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="form-edit-transaction">
                         <input type="hidden" id="edit-id">
-                        <input type="hidden" id="edit-old-amount">
-                        <input type="hidden" id="edit-type"> <div class="mb-3">
-                            <label class="form-label text-secondary small fw-bold">JUMLAH (IDR)</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">Rp</span>
-                                <input type="text" class="form-control border-start-0 fw-bold" id="edit-amount" required inputmode="numeric" data-currency-input="true">
-                            </div>
-                        </div>
+                        <input type="hidden" id="edit-type">
 
+                        <div class="mb-3">
+                            <label class="form-label text-secondary small fw-bold">JUMLAH (IDR)</label>
+                            <input type="text" class="form-control fw-bold" id="edit-amount" required inputmode="numeric" data-currency-input="true">
+                        </div>
                         <div class="mb-3">
                             <label class="form-label text-secondary small fw-bold">TANGGAL</label>
                             <input type="date" class="form-control" id="edit-date" required>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label text-secondary small fw-bold">KATEGORI</label>
-                            <select class="form-select" id="edit-category">
-                                </select>
+                            <select class="form-select" id="edit-category"></select>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label text-secondary small fw-bold">CATATAN</label>
                             <textarea class="form-control" id="edit-description" rows="2"></textarea>
                         </div>
-
-                        <div class="alert alert-warning small py-2 d-flex align-items-center">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            <div>Untuk mengubah Akun Sumber/Tujuan, silakan hapus dan buat baru.</div>
-                        </div>
                     </form>
                 </div>
                 <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary" onclick="window.HistoryView.handleSaveEdit()">Simpan Perubahan</button>
+                    <button type="button" class="btn btn-primary w-100" onclick="window.HistoryView.handleSaveEdit()">Simpan Perubahan</button>
                 </div>
             </div>
         </div>
