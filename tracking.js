@@ -1,13 +1,12 @@
 /**
- * MODULE: TRACKING (Revisi #10 - Final CSS Injection Fix)
+ * MODULE: TRACKING (Revisi #11 - Sorting Fix)
  * Perbaikan:
- * 1. Menyuntikkan <style> khusus ke head untuk memaksa konsistensi.
- * 2. Class '.tracking-box-fix' diterapkan ke Akun & Kategori.
- * 3. Reset margin label agar sejajar vertikal.
+ * 1. Sorting Strict pada Mini History (Date Descending -> ID Descending).
+ * 2. Transaksi yang baru diinput di hari yang sama akan langsung muncul paling atas.
  */
 
 // =======================================================
-// 1. DATA SERVICE (Tidak Berubah)
+// 1. DATA SERVICE
 // =======================================================
 if (!window.TransactionService) {
     window.TransactionService = {
@@ -36,7 +35,20 @@ if (!window.TransactionService) {
 
         async getRecent(limit = 6) {
             return new Promise(resolve => {
-                const sorted = [...(db.transactions || [])].sort((a, b) => new Date(b.date) - new Date(a.date));
+                // LOGIKA SORTING BARU:
+                // 1. Tanggal (Terbaru ke Terlama)
+                // 2. ID (Terbesar ke Terkecil) -> ID besar berarti inputan lebih baru (waktu lebih akhir)
+                const sorted = [...(db.transactions || [])].sort((a, b) => {
+                    const dateA = new Date(a.date).getTime();
+                    const dateB = new Date(b.date).getTime();
+                    
+                    // Prioritas 1: Bandingkan Tanggal
+                    if (dateB !== dateA) return dateB - dateA;
+                    
+                    // Prioritas 2: Bandingkan ID (Waktu Input)
+                    return b.id - a.id;
+                });
+                
                 resolve(sorted.slice(0, limit));
             });
         },
@@ -92,9 +104,9 @@ window.TrackingView = {
     },
 
     async init() {
-        console.log("TrackingView initialized (Rev #10 - CSS Inject)");
+        console.log("TrackingView initialized (Rev #11 - Sorting Fix)");
 
-        // 1. INJECT CSS KHUSUS (Agresif Fix)
+        // 1. INJECT CSS KHUSUS
         this.injectCustomStyles();
 
         // 2. FIX NOMINAL FONT
@@ -114,7 +126,6 @@ window.TrackingView = {
         const catSelect = document.getElementById('category');
         if (catSelect) {
             catSelect.classList.add('tracking-box-fix');
-            // Reset style inline jika ada sisa revisi sebelumnya
             catSelect.style.height = ''; 
             catSelect.style.padding = '';
         }
@@ -130,7 +141,6 @@ window.TrackingView = {
         this.renderMiniHistory();
     },
 
-    // --- FUNGSI BARU: INJECT STYLE ---
     injectCustomStyles() {
         if (document.getElementById('tracking-fix-style')) return;
 
@@ -153,17 +163,12 @@ window.TrackingView = {
                 align-items: center !important;
                 box-shadow: none !important;
             }
-            
-            /* Khusus Select asli (Kategori) perlu penyesuaian sedikit agar teks vertikal pas */
             select.tracking-box-fix {
-                /* Select native tidak support display:flex untuk contentnya di beberapa browser */
                 display: block !important; 
-                padding-top: 12px !important; /* Fallback vertical center */
+                padding-top: 12px !important;
                 padding-bottom: 12px !important;
                 line-height: 1.5 !important;
             }
-
-            /* Tombol Custom Dropdown */
             div.tracking-box-fix {
                 justify-content: space-between !important;
                 cursor: pointer !important;
@@ -234,9 +239,8 @@ window.TrackingView = {
         wrapper.id = `wrapper-${selectId}`;
         wrapper.className = 'dropdown w-100';
 
-        // 3. TOMBOL TRIGGER (Gunakan class inject .tracking-box-fix)
         const btnToggle = document.createElement('div'); 
-        btnToggle.className = 'tracking-box-fix'; // CLASS BARU
+        btnToggle.className = 'tracking-box-fix'; 
         btnToggle.setAttribute('data-bs-toggle', 'dropdown');
         
         btnToggle.innerHTML = `<span class="text-muted">${placeholder}</span> <i class="bi bi-chevron-down small"></i>`;
@@ -277,7 +281,6 @@ window.TrackingView = {
                     </div>
                     <i class="bi bi-chevron-down small text-muted"></i>
                 `;
-                // Simulasi Focus Border
                 btnToggle.style.borderColor = '#86b7fe'; 
                 btnToggle.style.boxShadow = '0 0 0 0.25rem rgba(13, 110, 253, 0.25)';
                 setTimeout(() => { 
@@ -301,6 +304,7 @@ window.TrackingView = {
         const container = document.getElementById('mini-history-list');
         if(!container) return;
 
+        // Fetch sudah menggunakan sorting yang diperbaiki
         const recents = await window.TransactionService.getRecent(6);
 
         if (recents.length === 0) {
